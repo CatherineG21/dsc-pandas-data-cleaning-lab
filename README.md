@@ -99,8 +99,7 @@ In the cell below, load `heroes_information.csv` as `heroes_df`:
 
 
 ```python
-# Your code here
-
+heroes_df = pd.read_csv("heroes_information.csv")
 heroes_df.head()
 ```
 
@@ -113,8 +112,7 @@ There are two ways to do this:
 
 
 ```python
-# Your code here
-
+heroes_df = pd.read_csv("heroes_information.csv", index_col=0)
 heroes_df.head()
 ```
 
@@ -157,7 +155,7 @@ In the cell below, inspect the overall shape of the dataframe:
 
 
 ```python
-# Your code here
+heroes_df.shape
 ```
 
 Now let's look at the info printout:
@@ -174,7 +172,7 @@ In the cell below, interpret that information. Do the data types line up with wh
 ```python
 # Replace None with appropriate text
 """
-None
+Yes, data types line up with what we expect. And there are missing values
 """
 ```
 
@@ -184,7 +182,8 @@ Now, repeat the same process with `super_hero_powers.csv`. Name the dataframe `p
 
 
 ```python
-# Your code here (create more cells as needed)
+powers_df = pd.read_csv("super_hero_powers.csv", index_col=0)
+powers_df.head()
 ```
 
 The following code will check if it was loaded correctly:
@@ -250,7 +249,10 @@ Write your answer below, and explain how it relates to the information we have:
 ```python
 # Replace None with appropriate text
 """
-None
+Since the publisher is the only relevant variable, it's important not to fill in missing values with guesses 
+(like "Marvel" or "other") as it could distort the data. Instead, it's more appropriate to drop rows with missing 
+publisher values to preserve the integrity of the dataset. Randomly filling in missing values could misrepresent 
+the actual distribution of publishers.
 """
 ```
 
@@ -258,7 +260,7 @@ Now, implement the strategy to drop rows with missing values using code. (You ca
 
 
 ```python
-# Your code here
+heroes_df.dropna(subset=["Publisher"], inplace=True)
 ```
 
 Now there should be no missing values in the publisher column:
@@ -289,7 +291,8 @@ Identify those two cases below:
 ```python
 # Replace None with appropriate text
 """
-None
+- We have both "Marvel Comics" and "Marvel" (missing the word "Comics")
+- We have both "DC Comics" and " DC Comics" (with an extra space at the beginning)
 """
 ```
 
@@ -297,7 +300,8 @@ Now, write some code to handle these cases. If you're not sure where to start, l
 
 
 ```python
-# Your code here
+heroes_df["Publisher"] = heroes_df["Publisher"].replace("Marvel", "Marvel Comics")
+heroes_df["Publisher"] = heroes_df["Publisher"].str.strip()
 ```
 
 Check your work below:
@@ -366,7 +370,12 @@ In the cell below, identify the shared key, and your strategy for joining the da
 ```python
 # Replace None with appropriate text
 """
-None
+The shared key between these datasets is the name of the superhero. In heroes_df,
+this is represented by the name column.
+To align the data for analysis, we need to transpose powers_df so that each record still represents a superhero rather
+than a power. Since the question focuses on attributes like height (which relate to heroes), this approach makes sense. 
+Additionally, because powers_df includes some names not found in heroes_df, an inner join is appropriate to ensure only 
+superheroes present in both datasets are retained.
 """
 ```
 
@@ -376,7 +385,8 @@ In the cell below, create a new dataframe called `heroes_and_powers_df` that con
 
 
 ```python
-# Your code here (create more cells as needed)
+powers_df_transposed = powers_df.T
+powers_df_transposed
 ```
 
 Run the code below to check your work:
@@ -550,7 +560,22 @@ Don't worry if the rows or columns are in a different order, all that matters is
 
 
 ```python
-# Your code here (create more cells as needed)
+# Start by dropping rows and columns that we know are irrelevant
+
+question_3_df = heroes_and_powers_df.copy()
+
+# Only rows with a relevant publisher
+question_3_df = question_3_df[
+    (question_3_df["Publisher"] == "Marvel Comics")
+    | (question_3_df["Publisher"] == "DC Comics")
+]
+
+# Only columns needed are Publisher and powers
+relevant_cols = list(powers_df.index)
+relevant_cols.append("Publisher")
+question_3_df = question_3_df[relevant_cols]
+
+question_3_df
 ```
 
 The code below checks that you have the correct dataframe structure:
@@ -632,7 +657,11 @@ Explain your question below:
 ```python
 # Replace None with appropriate text:
 """
-None
+Which powers have the highest chance of co-occurring in a hero (e.g., super strength and flight)?
+The question explores which superhero powers most often appear together in the same character. 
+The goal is to find patterns in power combinations, like whether flight and super strength frequently co-occur. 
+This will involve using descriptive statistics and a visualization (like a heatmap) to analyze and display how often 
+pairs of powers are shared by the same heroes.
 """
 ```
 
